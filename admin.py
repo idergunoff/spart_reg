@@ -82,6 +82,450 @@ async def tab(msg: types.Message):
         return
 
 
+@dp.callback_query_handler(text='bv_tab')
+@logger.catch
+async def bv_tab(call: types.CallbackQuery):
+    user = session.query(Admin).filter(Admin.admin_id == call.from_user.id, Admin.confirm == True).first()
+    if not user:
+        await bot.send_message(call.from_user.id, 'У вас нет прав администратора')
+        return
+    list_column = ['Номер', 'ФИО', 'Дата рождения', 'Место работы', 'Должность', 'Телефон', 'Дата регистрации', 'Имя пользователя телеграм']
+    list_width = [6, 35, 15, 25, 25, 20, 15, 25]
+    bd = Side(style='thin', color="000000")
+    wb = Workbook()
+    ws = wb.active
+    for n, col in enumerate(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']):
+        ws[f'{col}1'] = list_column[n]
+        ws.column_dimensions[col].width = list_width[n]
+    row = ws.row_dimensions[1]
+    row.font = Font(bold=True, name='Calibri', size=10)
+    row = ws.row_dimensions[1]
+    row.border = Border(bottom=bd)
+    n_row = 2
+    for n_team, team in enumerate(session.query(BeachVolleyball).all()):
+        p1 = session.query(Person).filter(Person.id == team.player_1).first()
+        ws[f'A{n_row}'] = n_team + 1
+        ws[f'B{n_row}'] = p1.full_name
+        ws[f'C{n_row}'] = p1.birthday
+        ws[f'D{n_row}'] = p1.company
+        ws[f'E{n_row}'] = p1.position
+        ws[f'F{n_row}'] = p1.phone
+        ws[f'G{n_row}'] = team.date_reg.strftime("%d.%m.%Y")
+        ws[f'H{n_row}'] = team.username_reg
+        n_row += 1
+        p2 = session.query(Person).filter(Person.id == team.player_2).first()
+        ws[f'B{n_row}'] = p2.full_name
+        ws[f'C{n_row}'] = p2.birthday
+        ws[f'D{n_row}'] = p2.company
+        ws[f'E{n_row}'] = p2.position
+        ws[f'F{n_row}'] = p2.phone
+        row = ws.row_dimensions[n_row]
+        row.border = Border(bottom=bd)
+        n_row += 1
+    file_name = 'Пляжный волейбол.xlsx'
+    wb.save(file_name)
+    await bot.send_document(call.from_user.id, open(file_name, 'rb'))
+    os.remove(file_name)
 
 
+
+@dp.callback_query_handler(text='sb_tab')
+@logger.catch
+async def sb_tab(call: types.CallbackQuery):
+    user = session.query(Admin).filter(Admin.admin_id == call.from_user.id, Admin.confirm == True).first()
+    if not user:
+        await bot.send_message(call.from_user.id, 'У вас нет прав администратора')
+        return
+    list_column = ['Номер', 'ФИО', 'Дата рождения', 'Место работы', 'Должность', 'Телефон', 'Дата регистрации', 'Имя пользователя телеграм']
+    list_width = [6, 35, 15, 25, 25, 20, 15, 25]
+    bd = Side(style='thin', color="000000")
+    wb = Workbook()
+    ws = wb.active
+    for n, col in enumerate(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']):
+        ws[f'{col}1'] = list_column[n]
+        ws.column_dimensions[col].width = list_width[n]
+    row = ws.row_dimensions[1]
+    row.font = Font(bold=True, name='Calibri', size=10)
+    row = ws.row_dimensions[1]
+    row.border = Border(bottom=bd)
+    n_row = 2
+    for n_team, team in enumerate(session.query(Streetball).all()):
+        p1 = session.query(Person).filter(Person.id == team.player_1).first()
+        ws[f'A{n_row}'] = n_team + 1
+        ws[f'B{n_row}'] = p1.full_name
+        ws[f'C{n_row}'] = p1.birthday
+        ws[f'D{n_row}'] = p1.company
+        ws[f'E{n_row}'] = p1.position
+        ws[f'F{n_row}'] = p1.phone
+        ws[f'G{n_row}'] = team.date_reg.strftime("%d.%m.%Y")
+        ws[f'H{n_row}'] = team.username_reg
+        n_row += 1
+        p2 = session.query(Person).filter(Person.id == team.player_2).first()
+        ws[f'B{n_row}'] = p2.full_name
+        ws[f'C{n_row}'] = p2.birthday
+        ws[f'D{n_row}'] = p2.company
+        ws[f'E{n_row}'] = p2.position
+        ws[f'F{n_row}'] = p2.phone
+        n_row += 1
+        p3 = session.query(Person).filter(Person.id == team.player_3).first()
+        ws[f'B{n_row}'] = p3.full_name
+        ws[f'C{n_row}'] = p3.birthday
+        ws[f'D{n_row}'] = p3.company
+        ws[f'E{n_row}'] = p3.position
+        ws[f'F{n_row}'] = p3.phone
+        n_row += 1
+        p4 = session.query(Person).filter(Person.id == team.player_4).first()
+        ws[f'B{n_row}'] = p4.full_name
+        ws[f'C{n_row}'] = p4.birthday
+        ws[f'D{n_row}'] = p4.company
+        ws[f'E{n_row}'] = p4.position
+        ws[f'F{n_row}'] = p4.phone
+        row = ws.row_dimensions[n_row]
+        row.border = Border(bottom=bd)
+        n_row += 1
+    file_name = 'Стритбол.xlsx'
+    wb.save(file_name)
+    await bot.send_document(call.from_user.id, open(file_name, 'rb'))
+    os.remove(file_name)
+
+
+@dp.callback_query_handler(text='ff_tab')
+@logger.catch
+async def ff_tab(call: types.CallbackQuery):
+    user = session.query(Admin).filter(Admin.admin_id == call.from_user.id, Admin.confirm == True).first()
+    if not user:
+        await bot.send_message(call.from_user.id, 'У вас нет прав администратора')
+        return
+    list_column = ['Номер', 'ФИО', 'Дата рождения', 'Место работы', 'Должность', 'Телефон', 'Дата регистрации', 'Имя пользователя телеграм']
+    list_width = [6, 35, 15, 25, 25, 20, 15, 25]
+    bd = Side(style='thin', color="000000")
+    wb = Workbook()
+    ws = wb.active
+    for n, col in enumerate(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']):
+        ws[f'{col}1'] = list_column[n]
+        ws.column_dimensions[col].width = list_width[n]
+    row = ws.row_dimensions[1]
+    row.font = Font(bold=True, name='Calibri', size=10)
+    row = ws.row_dimensions[1]
+    row.border = Border(bottom=bd)
+    n_row = 2
+    for n_team, team in enumerate(session.query(FigitalFootball).all()):
+        p1 = session.query(Person).filter(Person.id == team.player_1).first()
+        ws[f'A{n_row}'] = n_team + 1
+        ws[f'B{n_row}'] = p1.full_name
+        ws[f'C{n_row}'] = p1.birthday
+        ws[f'D{n_row}'] = p1.company
+        ws[f'E{n_row}'] = p1.position
+        ws[f'F{n_row}'] = p1.phone
+        ws[f'G{n_row}'] = team.date_reg.strftime("%d.%m.%Y")
+        ws[f'H{n_row}'] = team.username_reg
+        n_row += 1
+        p2 = session.query(Person).filter(Person.id == team.player_2).first()
+        ws[f'B{n_row}'] = p2.full_name
+        ws[f'C{n_row}'] = p2.birthday
+        ws[f'D{n_row}'] = p2.company
+        ws[f'E{n_row}'] = p2.position
+        ws[f'F{n_row}'] = p2.phone
+        n_row += 1
+        p3 = session.query(Person).filter(Person.id == team.player_3).first()
+        ws[f'B{n_row}'] = p3.full_name
+        ws[f'C{n_row}'] = p3.birthday
+        ws[f'D{n_row}'] = p3.company
+        ws[f'E{n_row}'] = p3.position
+        ws[f'F{n_row}'] = p3.phone
+        n_row += 1
+        p4 = session.query(Person).filter(Person.id == team.player_4).first()
+        ws[f'B{n_row}'] = p4.full_name
+        ws[f'C{n_row}'] = p4.birthday
+        ws[f'D{n_row}'] = p4.company
+        ws[f'E{n_row}'] = p4.position
+        ws[f'F{n_row}'] = p4.phone
+        row = ws.row_dimensions[n_row]
+        row.border = Border(bottom=bd)
+        n_row += 1
+    file_name = 'Фиджитал_футбол.xlsx'
+    wb.save(file_name)
+    await bot.send_document(call.from_user.id, open(file_name, 'rb'))
+    os.remove(file_name)
+
+
+@dp.callback_query_handler(text='fcr_tab')
+@logger.catch
+async def fcr_tab(call: types.CallbackQuery):
+    user = session.query(Admin).filter(Admin.admin_id == call.from_user.id, Admin.confirm == True).first()
+    if not user:
+        await bot.send_message(call.from_user.id, 'У вас нет прав администратора')
+        return
+    list_column = ['Номер', 'ФИО', 'Дата рождения', 'Место работы', 'Должность', 'Телефон', 'Дата регистрации', 'Имя пользователя телеграм']
+    list_width = [6, 35, 15, 25, 25, 20, 15, 25]
+    bd = Side(style='thin', color="000000")
+    wb = Workbook()
+    ws = wb.active
+    for n, col in enumerate(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']):
+        ws[f'{col}1'] = list_column[n]
+        ws.column_dimensions[col].width = list_width[n]
+    row = ws.row_dimensions[1]
+    row.font = Font(bold=True, name='Calibri', size=10)
+    row = ws.row_dimensions[1]
+    row.border = Border(bottom=bd)
+    n_row = 2
+    for n_team, team in enumerate(session.query(FamilyCatamaranRacing).all()):
+        p1 = session.query(Person).filter(Person.id == team.player_1).first()
+        ws[f'A{n_row}'] = n_team + 1
+        ws[f'B{n_row}'] = p1.full_name
+        ws[f'C{n_row}'] = p1.birthday
+        ws[f'D{n_row}'] = p1.company
+        ws[f'E{n_row}'] = p1.position
+        ws[f'F{n_row}'] = p1.phone
+        ws[f'G{n_row}'] = team.date_reg.strftime("%d.%m.%Y")
+        ws[f'H{n_row}'] = team.username_reg
+        n_row += 1
+        p2 = session.query(Person).filter(Person.id == team.player_2).first()
+        ws[f'B{n_row}'] = p2.full_name
+        ws[f'C{n_row}'] = p2.birthday
+        ws[f'D{n_row}'] = p2.company
+        ws[f'E{n_row}'] = p2.position
+        ws[f'F{n_row}'] = p2.phone
+        row = ws.row_dimensions[n_row]
+        row.border = Border(bottom=bd)
+        n_row += 1
+    file_name = 'Семейные_гонки_на_катамаранах.xlsx'
+    wb.save(file_name)
+    await bot.send_document(call.from_user.id, open(file_name, 'rb'))
+    os.remove(file_name)
+
+
+@dp.callback_query_handler(text='wo_tab')
+@logger.catch
+async def wo_tab(call: types.CallbackQuery):
+    user = session.query(Admin).filter(Admin.admin_id == call.from_user.id, Admin.confirm == True).first()
+    if not user:
+        await bot.send_message(call.from_user.id, 'У вас нет прав администратора')
+        return
+    list_column = ['Номер', 'ФИО', 'Дата рождения', 'Место работы', 'Должность', 'Телефон', 'Дата регистрации', 'Имя пользователя телеграм']
+    list_width = [6, 35, 15, 25, 25, 20, 15, 25]
+    bd = Side(style='thin', color="000000")
+    wb = Workbook()
+    ws = wb.active
+    for n, col in enumerate(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']):
+        ws[f'{col}1'] = list_column[n]
+        ws.column_dimensions[col].width = list_width[n]
+    row = ws.row_dimensions[1]
+    row.font = Font(bold=True, name='Calibri', size=10)
+    row = ws.row_dimensions[1]
+    row.border = Border(bottom=bd)
+    n_row = 2
+    for n_team, team in enumerate(session.query(Workout).all()):
+        p1 = session.query(Person).filter(Person.id == team.player).first()
+        ws[f'A{n_row}'] = n_team + 1
+        ws[f'B{n_row}'] = p1.full_name
+        ws[f'C{n_row}'] = p1.birthday
+        ws[f'D{n_row}'] = p1.company
+        ws[f'E{n_row}'] = p1.position
+        ws[f'F{n_row}'] = p1.phone
+        ws[f'G{n_row}'] = team.date_reg.strftime("%d.%m.%Y")
+        ws[f'H{n_row}'] = team.username_reg
+        row = ws.row_dimensions[n_row]
+        row.border = Border(bottom=bd)
+        n_row += 1
+    file_name = 'Воркаут.xlsx'
+    wb.save(file_name)
+    await bot.send_document(call.from_user.id, open(file_name, 'rb'))
+    os.remove(file_name)
+
+
+@dp.callback_query_handler(text='wb_tab')
+@logger.catch
+async def wb_tab(call: types.CallbackQuery):
+    user = session.query(Admin).filter(Admin.admin_id == call.from_user.id, Admin.confirm == True).first()
+    if not user:
+        await bot.send_message(call.from_user.id, 'У вас нет прав администратора')
+        return
+    list_column = ['Номер', 'ФИО', 'Дата рождения', 'Место работы', 'Должность', 'Телефон', 'Дата регистрации', 'Имя пользователя телеграм']
+    list_width = [6, 35, 15, 25, 25, 20, 15, 25]
+    bd = Side(style='thin', color="000000")
+    wb = Workbook()
+    ws = wb.active
+    for n, col in enumerate(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']):
+        ws[f'{col}1'] = list_column[n]
+        ws.column_dimensions[col].width = list_width[n]
+    row = ws.row_dimensions[1]
+    row.font = Font(bold=True, name='Calibri', size=10)
+    row = ws.row_dimensions[1]
+    row.border = Border(bottom=bd)
+    n_row = 2
+    for n_team, team in enumerate(session.query(Wakeboarding).all()):
+        p1 = session.query(Person).filter(Person.id == team.player).first()
+        ws[f'A{n_row}'] = n_team + 1
+        ws[f'B{n_row}'] = p1.full_name
+        ws[f'C{n_row}'] = p1.birthday
+        ws[f'D{n_row}'] = p1.company
+        ws[f'E{n_row}'] = p1.position
+        ws[f'F{n_row}'] = p1.phone
+        ws[f'G{n_row}'] = team.date_reg.strftime("%d.%m.%Y")
+        ws[f'H{n_row}'] = team.username_reg
+        row = ws.row_dimensions[n_row]
+        row.border = Border(bottom=bd)
+        n_row += 1
+    file_name = 'Вейкбординг.xlsx'
+    wb.save(file_name)
+    await bot.send_document(call.from_user.id, open(file_name, 'rb'))
+    os.remove(file_name)
+
+
+@dp.callback_query_handler(text='rc_tab')
+@logger.catch
+async def rc_tab(call: types.CallbackQuery):
+    user = session.query(Admin).filter(Admin.admin_id == call.from_user.id, Admin.confirm == True).first()
+    if not user:
+        await bot.send_message(call.from_user.id, 'У вас нет прав администратора')
+        return
+    list_column = ['Номер', 'ФИО', 'Дата рождения', 'Место работы', 'Должность', 'Телефон', 'Дата регистрации', 'Имя пользователя телеграм']
+    list_width = [6, 35, 15, 25, 25, 20, 15, 25]
+    bd = Side(style='thin', color="000000")
+    wb = Workbook()
+    ws = wb.active
+    for n, col in enumerate(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']):
+        ws[f'{col}1'] = list_column[n]
+        ws.column_dimensions[col].width = list_width[n]
+    row = ws.row_dimensions[1]
+    row.font = Font(bold=True, name='Calibri', size=10)
+    row = ws.row_dimensions[1]
+    row.border = Border(bottom=bd)
+    n_row = 2
+    for n_team, team in enumerate(session.query(RockClimbing).all()):
+        p1 = session.query(Person).filter(Person.id == team.player).first()
+        ws[f'A{n_row}'] = n_team + 1
+        ws[f'B{n_row}'] = p1.full_name
+        ws[f'C{n_row}'] = p1.birthday
+        ws[f'D{n_row}'] = p1.company
+        ws[f'E{n_row}'] = p1.position
+        ws[f'F{n_row}'] = p1.phone
+        ws[f'G{n_row}'] = team.date_reg.strftime("%d.%m.%Y")
+        ws[f'H{n_row}'] = team.username_reg
+        row = ws.row_dimensions[n_row]
+        row.border = Border(bottom=bd)
+        n_row += 1
+    file_name = 'Скалолазание.xlsx'
+    wb.save(file_name)
+    await bot.send_document(call.from_user.id, open(file_name, 'rb'))
+    os.remove(file_name)
+
+
+@dp.callback_query_handler(text='chess_tab')
+@logger.catch
+async def chess_tab(call: types.CallbackQuery):
+    user = session.query(Admin).filter(Admin.admin_id == call.from_user.id, Admin.confirm == True).first()
+    if not user:
+        await bot.send_message(call.from_user.id, 'У вас нет прав администратора')
+        return
+    list_column = ['Номер', 'ФИО', 'Дата рождения', 'Место работы', 'Должность', 'Телефон', 'Дата регистрации', 'Имя пользователя телеграм']
+    list_width = [6, 35, 15, 25, 25, 20, 15, 25]
+    bd = Side(style='thin', color="000000")
+    wb = Workbook()
+    ws = wb.active
+    for n, col in enumerate(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']):
+        ws[f'{col}1'] = list_column[n]
+        ws.column_dimensions[col].width = list_width[n]
+    row = ws.row_dimensions[1]
+    row.font = Font(bold=True, name='Calibri', size=10)
+    row = ws.row_dimensions[1]
+    row.border = Border(bottom=bd)
+    n_row = 2
+    for n_team, team in enumerate(session.query(Chess).all()):
+        p1 = session.query(Person).filter(Person.id == team.player).first()
+        ws[f'A{n_row}'] = n_team + 1
+        ws[f'B{n_row}'] = p1.full_name
+        ws[f'C{n_row}'] = p1.birthday
+        ws[f'D{n_row}'] = p1.company
+        ws[f'E{n_row}'] = p1.position
+        ws[f'F{n_row}'] = p1.phone
+        ws[f'G{n_row}'] = team.date_reg.strftime("%d.%m.%Y")
+        ws[f'H{n_row}'] = team.username_reg
+        row = ws.row_dimensions[n_row]
+        row.border = Border(bottom=bd)
+        n_row += 1
+    file_name = 'Шахматы.xlsx'
+    wb.save(file_name)
+    await bot.send_document(call.from_user.id, open(file_name, 'rb'))
+    os.remove(file_name)
+
+
+@dp.callback_query_handler(text='ss_tab')
+@logger.catch
+async def ss_tab(call: types.CallbackQuery):
+    user = session.query(Admin).filter(Admin.admin_id == call.from_user.id, Admin.confirm == True).first()
+    if not user:
+        await bot.send_message(call.from_user.id, 'У вас нет прав администратора')
+        return
+    list_column = ['Номер', 'ФИО', 'Дата рождения', 'Место работы', 'Должность', 'Телефон', 'Дата регистрации', 'Имя пользователя телеграм']
+    list_width = [6, 35, 15, 25, 25, 20, 15, 25]
+    bd = Side(style='thin', color="000000")
+    wb = Workbook()
+    ws = wb.active
+    for n, col in enumerate(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']):
+        ws[f'{col}1'] = list_column[n]
+        ws.column_dimensions[col].width = list_width[n]
+    row = ws.row_dimensions[1]
+    row.font = Font(bold=True, name='Calibri', size=10)
+    row = ws.row_dimensions[1]
+    row.border = Border(bottom=bd)
+    n_row = 2
+    for n_team, team in enumerate(session.query(SupSurfing).all()):
+        p1 = session.query(Person).filter(Person.id == team.player).first()
+        ws[f'A{n_row}'] = n_team + 1
+        ws[f'B{n_row}'] = p1.full_name
+        ws[f'C{n_row}'] = p1.birthday
+        ws[f'D{n_row}'] = p1.company
+        ws[f'E{n_row}'] = p1.position
+        ws[f'F{n_row}'] = p1.phone
+        ws[f'G{n_row}'] = team.date_reg.strftime("%d.%m.%Y")
+        ws[f'H{n_row}'] = team.username_reg
+        row = ws.row_dimensions[n_row]
+        row.border = Border(bottom=bd)
+        n_row += 1
+    file_name = 'SUPсерфинг.xlsx'
+    wb.save(file_name)
+    await bot.send_document(call.from_user.id, open(file_name, 'rb'))
+    os.remove(file_name)
+
+
+@dp.callback_query_handler(text='ccw_tab')
+@logger.catch
+async def ccw_tab(call: types.CallbackQuery):
+    user = session.query(Admin).filter(Admin.admin_id == call.from_user.id, Admin.confirm == True).first()
+    if not user:
+        await bot.send_message(call.from_user.id, 'У вас нет прав администратора')
+        return
+    list_column = ['Номер', 'ФИО родителя', 'ФИО ребенка', 'Дата рождения', 'Место работы', 'Должность', 'Телефон', 'Дата регистрации', 'Имя пользователя телеграм']
+    list_width = [6, 35, 35, 15, 25, 25, 20, 15, 25]
+    bd = Side(style='thin', color="000000")
+    wb = Workbook()
+    ws = wb.active
+    for n, col in enumerate(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']):
+        ws[f'{col}1'] = list_column[n]
+        ws.column_dimensions[col].width = list_width[n]
+    row = ws.row_dimensions[1]
+    row.font = Font(bold=True, name='Calibri', size=10)
+    row = ws.row_dimensions[1]
+    row.border = Border(bottom=bd)
+    n_row = 2
+    for n_team, team in enumerate(session.query(ChildrenClimbingWall).all()):
+        p1 = session.query(Person).filter(Person.id == team.player).first()
+        ws[f'A{n_row}'] = n_team + 1
+        ws[f'B{n_row}'] = team.parent_name
+        ws[f'C{n_row}'] = p1.full_name
+        ws[f'D{n_row}'] = p1.birthday
+        ws[f'E{n_row}'] = p1.company
+        ws[f'F{n_row}'] = p1.position
+        ws[f'G{n_row}'] = p1.phone
+        ws[f'H{n_row}'] = team.date_reg.strftime("%d.%m.%Y")
+        ws[f'I{n_row}'] = team.username_reg
+        row = ws.row_dimensions[n_row]
+        row.border = Border(bottom=bd)
+        n_row += 1
+    file_name = 'Детский_скалодром.xlsx'
+    wb.save(file_name)
+    await bot.send_document(call.from_user.id, open(file_name, 'rb'))
+    os.remove(file_name)
 

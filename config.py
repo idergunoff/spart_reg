@@ -6,7 +6,7 @@ from aiogram import types, executor
 from aiogram.utils.exceptions import MessageCantBeDeleted, BadRequest, MigrateToChat, CantInitiateConversation, BotBlocked
 from aiogram.utils import exceptions
 from loguru import logger
-from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
+# from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 from emoji import emojize
 from openpyxl import Workbook
 from openpyxl.styles import colors
@@ -17,13 +17,14 @@ from datetime import datetime
 
 from models import *
 from button import *
-import pytz
+# import pytz
 
-tz = pytz.timezone('Europe/Moscow')
+# tz = pytz.timezone('Europe/Moscow')
 
-super_admin = [325053382]
+super_admin = [325053382, 473913334]
 
 TOKEN = '5590505820:AAHdJNYfpJGiAmOfh8SRbFdpDWK9VdjDCZE' # тест
+# TOKEN = '6215573338:AAFoAsqdINvNGbloL8qfKct3_7VOG8rRSMU' # TN
 
 
 session = Session()
