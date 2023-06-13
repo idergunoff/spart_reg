@@ -1,0 +1,104 @@
+from config import *
+
+
+class SSStates(StatesGroup):
+    FULLNAME = State()
+    BIRTHDAY = State()
+    COMPANY = State()
+    POSITION = State()
+    PHONE = State()
+    END = State()
+
+
+@dp.message_handler(commands=['cancel'], state='*')
+@logger.catch
+async def cancel(msg: types.Message, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+    await state.finish()
+    await msg.reply('Вы отменили регистрацию')
+    logger.info(f'USER "{msg.from_user.id}" COMMAND CANCEL')
+
+
+@dp.callback_query_handler(text='ss')
+@logger.catch
+async def wo(call: types.CallbackQuery):
+    await SSStates.FULLNAME.set()
+    await call.message.edit_text('<b>Участник</b>\nОтправьте ФИО полностью\n\n<i>Для отмены нажмите /cancel</i>')
+
+
+@dp.message_handler(state=SSStates.FULLNAME)
+@logger.catch
+async def fullname(msg: types.Message, state: FSMContext):
+    await state.update_data(fullname=msg.text)
+    await SSStates.BIRTHDAY.set()
+    await bot.send_message(msg.from_user.id, '<b>Участник</b>\nОтправьте дату рождения в формате ДД.ММ.ГГГГ'
+                                             '\n\n<i>Для отмены нажмите /cancel</i>')
+
+
+@dp.message_handler(state=SSStates.BIRTHDAY)
+@logger.catch
+async def birthday(msg: types.Message, state: FSMContext):
+    await state.update_data(birthday=msg.text)
+    await SSStates.COMPANY.set()
+    await bot.send_message(msg.from_user.id, '<b>Участник</b>\nОтправьте место работы (наименование '
+                                             'подразделения/управление/отдел/служба/цех)\n\n<i>Для отмены нажмите /cancel</i>')
+
+
+@dp.message_handler(state=SSStates.COMPANY)
+@logger.catch
+async def company(msg: types.Message, state: FSMContext):
+    await state.update_data(company=msg.text)
+    await SSStates.POSITION.set()
+    await bot.send_message(msg.from_user.id, '<b>Участник</b>\nОтправьте должность\n\n<i>Для отмены нажмите /cancel</i>')
+
+
+@dp.message_handler(state=SSStates.POSITION)
+@logger.catch
+async def position(msg: types.Message, state: FSMContext):
+    await state.update_data(position=msg.text)
+    await SSStates.PHONE.set()
+    await bot.send_message(msg.from_user.id, '<b>Участник</b>\nОтправьте номер телефона\n\n<i>Для отмены нажмите /cancel</i>')
+
+
+@dp.message_handler(state=SSStates.PHONE)
+@logger.catch
+async def phone(msg: types.Message, state: FSMContext):
+    await state.update_data(phone=msg.text)
+    await SSStates.END.set()
+    ss_data = await state.get_data()
+    btn_cancel = InlineKeyboardButton('Отмена', callback_data='cancel')
+    btn_confirm = InlineKeyboardButton('Подтвердить', callback_data='confirm')
+    keyboard = InlineKeyboardMarkup(row_width=2).add(btn_cancel, btn_confirm)
+    mes = f'<b>SUP СЕРФИНГ🏄‍♂️🏄‍♀️️</b>\n\n' \
+          f'<b><u>Участник</u></b>\n<i><b>ФИО:</b></i> {ss_data["fullname"]}\n<i><b>Дата рождения:</b></i> {ss_data["birthday"]}\n' \
+          f'<i><b>Место работы:</b></i> {ss_data["company"]}\n<i><b>Должность:</b></i> {ss_data["position"]}\n<b><i>Телефон:</i></b> {ss_data["phone"]}\n\n' \
+          f'<i>Подтвердить? Если в данных допущены ошибки, нажмите на кнопку "Отмена" и повторите регистрацию</i>'
+    await bot.send_message(msg.from_user.id, mes, reply_markup=keyboard)
+
+
+@dp.callback_query_handler(state=SSStates.END, text='confirm')
+@logger.catch
+async def confirm(call: types.CallbackQuery, state: FSMContext):
+    ss_data = await state.get_data()
+    new_person = Person(full_name=ss_data['fullname'], birthday=ss_data['birthday'],
+                        company=ss_data['company'], position=ss_data['position'], phone=ss_data['phone'])
+    session.add(new_person)
+    session.commit()
+    new_ss = SupSurfing(username_reg=call.from_user.username, date_reg=datetime.now(), player=new_person.id)
+    session.add(new_ss)
+    session.commit()
+    await call.message.answer('Регистрация участника в соревновании по SUP серфингу прошла успешно')
+    await state.finish()
+    await call.answer()
+
+
+@dp.callback_query_handler(state=SSStates.END, text='cancel')
+@logger.catch
+async def cancel(call: types.CallbackQuery, state: FSMContext):
+    await state.finish()
+    await call.message.answer('Регистрация отменена')
+    await call.message.delete()
+    await call.answer()
+

@@ -21,6 +21,7 @@ import pytz
 
 tz = pytz.timezone('Europe/Moscow')
 
+super_admin = [325053382]
 
 TOKEN = '5590505820:AAHdJNYfpJGiAmOfh8SRbFdpDWK9VdjDCZE' # тест
 

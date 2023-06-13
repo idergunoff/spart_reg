@@ -7,16 +7,7 @@ from emoji import emojize
 # CallbackData
 
 
-cb_admins = CallbackData('admins', 'chat_id') # id чата для меню админов
-cb_add_admin = CallbackData('add_admin', 'chat_id') # id чата для добавления администратора
-cb_del_admin = CallbackData('del_admin', 'chat_id') # id чата для удаления администратора
-cb_add_user_admin = CallbackData('add_user_admin', 'chat_id', 'user_id') # id чата и юзера для добавления администратора
-cb_del_user_admin = CallbackData('del_user_admin', 'chat_id', 'user_id') # id чата и юзера для удаления администратора
-cb_back_admins = CallbackData('back_admins', 'chat_id') # id чата для возврата в меню админов
-cb_back_task_admin = CallbackData('back_task_admin', 'chat_id') # id чата для выхода из меню админа
-
-cb_update_chat = CallbackData('update_chat', 'chat_id') # id чата и название для обновления chat_id
-cb_exit_chat= CallbackData('exit_chat', 'chat_id')  # id чата для выхода из чата
+cb_confirm_admin = CallbackData('admins', 'admin_id', 'confirm')
 
 
 # KeyboardButton
