@@ -32,6 +32,13 @@ async def reg(msg: types.Message):
     logger.info(f'USER "{msg.from_user.id}" COMMAND REG')
 
 
+@dp.message_handler(text='Информацияℹ️')
+@logger.catch
+async def info(msg: types.Message):
+    await bot.send_message(msg.from_user.id, 'Информация о спартакиаде')
+    logger.info(f'USER "{msg.from_user.id}" COMMAND INFO')
+
+
 async def shutdown(dispatcher: Dispatcher):
     await dispatcher.storage.close()
     await dispatcher.storage.wait_closed()

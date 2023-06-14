@@ -12,7 +12,7 @@ cb_confirm_admin = CallbackData('admins', 'admin_id', 'confirm')
 
 # KeyboardButton
 
-btn_help = KeyboardButton('Помощь🆘')
+btn_info = KeyboardButton('Информацияℹ️')
 btn_reg = KeyboardButton('Регистрация📝')
 
 
@@ -36,12 +36,9 @@ kb_types.add(btn_bv, btn_sb, btn_wo, btn_wb, btn_rc, btn_fcr, btn_ccw, btn_chess
 # ReplyKeyboardMarkup
 
 kb_start = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
-kb_start.row(btn_reg, btn_help)
+kb_start.row(btn_reg, btn_info)
 
 
-class TaskStates(StatesGroup):
-    TIME_TASK = State()
-    USER_DELETE = State()
 
 
 
